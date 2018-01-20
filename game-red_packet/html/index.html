@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #FF2948;
+            overflow: hidden;
+            box-sizing: border-box;
+            padding: 80px;
+            padding-left: 300px;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .game-wrap {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            border: solid 5px #FAD11D;
+            border-radius: 10px;
+            position: relative;
+            background: white url("../img/bg.png") repeat-x 0 550px;
+        }
+
+        .game-wrap .game-mask {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, .3);
+            z-index: 2;
+        }
+
+        .game-wrap .start-game {
+            display: block;
+            width: 500px;
+            height: 246px;
+            background: url("../img/start-btn.png") no-repeat;
+            background-size: 100%;
+            cursor: pointer;
+            margin: auto;
+            margin-top: 246px;
+        }
+
+        .game-wrap .num-list {
+            position: absolute;
+            width: 180px;
+            height: 500px;
+            box-sizing: border-box;
+            padding: 50px 0;
+            left: 10px;
+            z-index: 1;
+        }
+
+        .game-wrap .num-list li {
+            background-color: pink;
+            width: 180px;
+            height: 180px;
+            border-radius: 90px;
+            margin-bottom: 15px;
+            color: white;
+            text-align: center;
+            line-height: 80px;
+            font-size: 16px;
+            border: solid 2px white;
+            position: relative;
+        }
+
+        .game-wrap .num-list li:nth-of-type(1) {
+            background-color: rgba(250, 209, 29, .8);
+        }
+
+        .game-wrap .num-list li:nth-of-type(2) {
+            background-color: rgba(68, 77, 74, .8);
+        }
+
+        .bag {
+            width: 100px;
+            height: 104px;
+            position: absolute;
+            top: 0;
+            background: url("../img/red-bag.png") no-repeat;
+            background-size: 100%;
+            cursor: pointer;
+        }
+
+        .num-box {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            font: 30px/80px "微软雅黑";
+        }
+
+        .bag-box {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+
+        }
+
+    </style>
+</head>
+<body>
+<section class="game-wrap">
+    <div class="game-mask">
+        <span class="start-game"></span>
+    </div>
+    <ul class="num-list">
+        <li>红包总额：
+            <div class="num-box">0</div>
+        </li>
+        <li>错过的红包：
+            <div class="num-box">0</div>
+        </li>
+    </ul>
+    <div class="bag-box"></div>
+</section>
+<script src="../js/tween.js"></script>
+<script src="../js/Tween2.0.js"></script>
+<script src="../js/shake.js"></script>
+<script>
+    //var topEnd = window.innerHeight;
+
+    //获取需要的元素
+    var gameWrap = document.getElementsByClassName("game-wrap")[0];
+    var startGame = document.getElementsByClassName("start-game")[0];
+    var gameMask = document.getElementsByClassName("game-mask");
+    var numList = document.getElementsByClassName("num-list");
+    var numBox = document.getElementsByClassName("num-box");
+    var bagBox = document.getElementsByClassName("bag-box")[0];
+
+    //定义变量inNum记录得到红包金额，outNum记录掉落红包数量
+    var inNum = 0, outNum = 0;
+
+    //定义对象数组存放红包种类图片
+    var bagImg = [{"src": '../img/2.png', "price": 1},
+        {"src": '../img/3.png', "price": 2}, {"src": '../img/4.png', "price": 1111},
+        {"src": '../img/5.png', "price": 5}, {"src": '../img/6.png', "price": 10}, {"src": '../img/7.png', "price": 0}]
+    //点击开始游戏，执行动画效果，开始游戏
+    startGame.onclick = function () {
+        gameMask[0].style.display = "none";
+        MTween(numList[0], 'left', '', -200, 800, 'px', 'linear', function () {
+            setDiv();
+        });
+
+    }
+
+    //生成div
+    function setDiv() {
+        bagBox.innerHTML += '<div class="bag"></div>';
+        //生成1个div
+        var box = document.querySelector(".bag");
+        var n = parseInt(getStyle(gameWrap, "width")) - 110;
+        box.style.left = Math.floor(Math.random() * n) + 'px';
+
+        var timer = 0;
+        var s = getStyle(gameWrap, "height");
+
+        timer = setInterval(function () {
+            //div向下掉落
+            box.style.top = parseFloat(getStyle(box, "top")) + 10 + 'px'; //变+不变
+
+            //div的top最终值为浏览器的高度减去自身高度
+            if (parseFloat(getStyle(box, "top")) >= (parseFloat(s) - 114)) {
+                //div高度达到临界值，关闭定时器，清除div
+                clearInterval(timer);
+                box.parentNode.removeChild(box);
+                shake(gameWrap, "top", 45, 5, function () {
+                    outNum++;
+                    numBox[1].innerHTML = outNum;
+                    //如果掉落红包数达到3个，弹出提示框，执行动画效果游戏结束
+                    if (outNum == 3) {
+                        alert('恭喜你，一共抢到' + inNum + '元，快去购物吧');
+                        MTween(numList[0], 'left', '', 10, 800, 'px', 'linear', function () {
+                            inNum = numBox[0].innerHTML = 0;
+                            outNum = numBox[1].innerHTML = 0;
+                            gameMask[0].style.display = "block";
+                        });
+
+                    } else {
+                        //否则，再次执行setDiv()
+                        setDiv();
+                    }
+                });
+            }
+            //点击掉落的红包
+            box.onclick = function () {
+                //判断是否已经被点击
+                if (this.state) return;
+                this.state = true;
+
+                //点击div时关闭定时器
+                clearInterval(timer);
+
+
+                //随机数控制不同红包出现概率
+                var randomNum = Math.floor(Math.random() * 100);
+                if (randomNum >= 4) {
+                    box.style.backgroundImage = 'url(' + bagImg[5].src + ')';
+                } else {
+                    box.style.backgroundImage = 'url(' + bagImg[randomNum].src + ')';
+                }
+
+                //执行红包抖动动画效果
+                shake(this, "left", 30, 5, function () {
+                        //清除点击的div
+                        box.parentNode.removeChild(box);
+                        //记录累计金额
+                        if (randomNum <= 4) {
+                            inNum += bagImg[randomNum].price;
+                        }
+                        numBox[0].innerHTML = inNum;
+                        //再次调用setDiv函数生成新的div
+                        setDiv();
+                    }
+                )
+            }
+        }, 20)
+    }
+</script>
+</body>
+</html>
