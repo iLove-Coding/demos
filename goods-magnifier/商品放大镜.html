@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+            padding-top: 100px;
+        }
+
+        .enlarge-wrap {
+            width: 860px;
+            height: 450px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            border: solid 1px #e8e8e8;
+            padding: 20px 20px;
+        }
+
+        .enlarge-wrap .goods-display {
+            display: inline-block;
+            width: 400px;
+            height: 400px;
+            vertical-align: top;
+            margin-right: 10px;
+            position: relative;
+        }
+
+        .enlarge-wrap .enlarge-display {
+            display: inline-block;
+            width: 400px;
+            height: 400px;
+            vertical-align: top;
+            display: none;
+            background: url("img/good2.jpg") no-repeat;
+        }
+
+        .enlarge-wrap .move-point {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: url("img/point.png") repeat;
+            /*background: url("img/good1.jpg") no-repeat;*/
+            left: 0;
+            top: 0;
+            display: none;
+            /*border-radius: 100px;*/
+        }
+    </style>
+</head>
+<body>
+<section class="enlarge-wrap">
+    <div class="goods-display">
+        <img src="img/good1.jpg" alt="">
+        <div class="move-point"></div>
+    </div>
+    <div class="enlarge-display"></div>
+</section>
+<script>
+
+    var movePoint = document.querySelector(".move-point");
+    var goodsDisplay = document.querySelector(".goods-display");
+    var enlargeDisplay = document.querySelector(".enlarge-display");
+
+    goodsDisplay.onmousemove = function (event) {
+        movePoint.style.display = "block";
+        enlargeDisplay.style.display = "inline-block";
+
+        //event兼容性
+        var oEvent = event || window.event;
+        movePoint.style.top = oEvent.clientY - movePoint.parentNode.offsetTop - movePoint.offsetHeight / 2 + 'px';
+        movePoint.style.left = oEvent.clientX - movePoint.parentNode.offsetLeft - movePoint.offsetWidth / 2 + 'px';
+
+        //边界处理
+        if (movePoint.offsetTop <= 0) {
+            movePoint.style.top = 0;
+        }
+        if (movePoint.offsetTop >= this.offsetHeight / 2) {
+            movePoint.style.top = this.offsetHeight / 2 + 'px';
+        }
+        if (movePoint.offsetLeft <= 0) {
+            movePoint.style.left = 0;
+        }
+        if (movePoint.offsetLeft >= this.offsetWidth / 2) {
+            movePoint.style.left = this.offsetWidth / 2 + 'px';
+        }
+
+        //计算移动比例
+        var leftRatio = movePoint.offsetLeft / movePoint.parentNode.offsetWidth;
+        var topRatio = movePoint.offsetTop / movePoint.parentNode.offsetHeight;
+
+        //设置背景图位置
+        enlargeDisplay.style.backgroundPositionX = -leftRatio * 800 + "px";
+        enlargeDisplay.style.backgroundPositionY = -topRatio * 800 + "px";
+
+    }
+
+    goodsDisplay.onmouseout = function () {
+        movePoint.style.display = "none";
+        enlargeDisplay.style.display = "none";
+    }
+
+</script>
+</body>
+</html>
