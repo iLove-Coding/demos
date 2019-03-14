@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .img {
+            width: 350px;
+            height: 350px;
+            background-color: gray;
+        }
+
+        .pic {
+           width: 100%;
+           height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i2/809445948/TB2SWa_X8HH8KJjy0FbXXcqlpXa_!!809445948.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i1/646384886/O1CN01k5eXeu1lxpfsAQpX4_!!646384886.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i3/1931820107/TB2euIKc25TBuNjSspcXXbnGFXa_!!1931820107.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i2/48443863/TB2B0f.b5AnBKNjSZFvXXaTKXXa_!!48443863.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i1/553739673/O1CN018xZ5YD2LKHdbhXTgj_!!553739673.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i2/411712309/TB2ySqAaVkoBKNjSZFEXXbrEVXa_!!411712309.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i3/25775886143/TB2_CpWjbBmpuFjSZFAXXaQ0pXa_!!25775886143.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i1/81623717/TB2ua_.AYSYBuNjSspfXXcZCpXa_!!81623717.jpg_300x300q85s150.jpg_.webp">
+        </div>
+        <div class="img">
+            <img class="pic" alt="loading" data-src="https://img.alicdn.com/bao/uploaded/i4/1706757228/TB2V9VquXXXXXcnXpXXXXXXXXXX_!!1706757228.jpg_300x300q85s150.jpg_.webp">
+        </div>
+    </div>
+    <script>
+        function upThrottle(fn, delay) {
+            let lastTime = 0,
+                timer = null;
+            
+            return function () {
+                // 保存调用时的上下文
+                let context = this;
+                // 保存调用时的参数
+                let args = arguments;
+                // 记录本次触发的时间
+                let nowTime = new Date().getTime();
+                
+                // 判断上次触发的时间和本次触发的时间差是否小于时间间隔的阈值
+                if (nowTime - lastTime < delay) {
+                    // 如果时间间隔小于我们设定的时间间隔阈值，则为本次触发操作设立一个新的定时器
+                    clearTimeout(timer)
+                    timer = setTimeout(function () {
+                        last = nowTime;
+                        fn.apply(context. args);
+                    }, delay);
+                } else {
+                    // 如果时间间隔超出了我们设定的时间间隔阈值，那就不等了，立刻反馈给用户一次响应
+                    last = nowTime;
+                    fn.apply(context, args);
+                }
+            }
+        }
+
+        const imgs = document.querySelectorAll('.pic');
+        let num = 0;
+        function isInSight(el) {
+            const bound = el.getBoundingClientRect();
+            const innerHeight = document.documentElement.clientHeight || window.innerHeight;
+            return bound.top <= innerHeight + 100;
+        }
+        function lazyload() {
+            // num用于统计当前显示到了哪一张图片，避免每次都从第一张图片开始检查是否露出
+            for (var i = num; i < imgs.length; i++) {
+                // 元素相对于文档顶部的距离 - 滚动高度 < 可视窗高度
+                if (isInSight(imgs[i])) {
+                    imgs[i].src = imgs[i].dataset['src'];
+                    // 前i张图片已经加载完毕，下次从第i+1张开始检查是否露出
+                    num = i + 1;
+                }
+            }
+        }
+
+        const scroll_throttle = upThrottle(lazyload, 1000);
+
+        // 监听Scroll事件
+        window.addEventListener('load', lazyload, false);
+        window.addEventListener('scroll', scroll_throttle, false);
+    </script>
+</body>
+</html>
